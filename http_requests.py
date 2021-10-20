@@ -1,4 +1,4 @@
-from typing import Any, Coroutine, Tuple
+from typing import Any, Coroutine, List, Tuple
 from aiohttp.client import ClientSession
 import asyncio
 import aiohttp
@@ -23,7 +23,7 @@ async def fetch_many(loop, urls) -> Coroutine[Any, Any, Tuple]:
         return await asyncio.gather(*tasks)
 
 
-def async_aiohttp_get_all(urls) -> Tuple:
+def async_aiohttp_get_all(urls) -> List:
     '''
         performs asynchronous get requests
     '''
