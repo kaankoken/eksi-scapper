@@ -37,7 +37,7 @@ def url_parser():
 
 
 def main():
-    # main page crawlign
+    # main page crawling
     url: str = BASE_URL + SEARCH_TAGS[0]
     page = requests.get(url=url, headers=random_headers())
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -48,6 +48,7 @@ def main():
 
     urls = create_urls(current_page, page_count)
     raw_page_list = async_aiohttp_get_all(urls)
+    raw_page_list.insert(0, page.content)
 
 
 if __name__ == "__main__":
