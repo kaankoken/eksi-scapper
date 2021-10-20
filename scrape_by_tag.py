@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 import requests
 from bs4 import BeautifulSoup
 from helper import random_headers
@@ -32,15 +32,43 @@ def create_urls(current_page: str, page_count: str) -> List[str]:
     return urls
 
 
-def url_parser():
-    pass
+def comment_parser(comments: List[BeautifulSoup]):
+    for comment in comments:
+        print(comment.attrs)
+
+
+def url_parser(raw_content: List) -> List[BeautifulSoup]:
+    retry_list: List[Dict[int: Any]] = []
+    comments: List[BeautifulSoup] = []
+
+    for index, page in enumerate(raw_content):
+        soup: BeautifulSoup = BeautifulSoup(page, 'html.parser')
+        container = soup.find('div', id='topic')
+
+        if container is None:
+            retry_list.append({index: page})
+            continue
+        # TODO: handle retry_list later
+        comment_list = container.find('ul', id='entry-item-list')
+        try:
+            comment_list_item = comment_list.find_all('li')
+
+            comments.extend(comment_list_item)
+        except AttributeError:
+            print('Has no entry-item-list')
+
+    print(len(retry_list))
+    if len(retry_list) > 0:
+        exit(0)
+
+    return comments
 
 
 def main():
     # main page crawling
     url: str = BASE_URL + SEARCH_TAGS[0]
     page = requests.get(url=url, headers=random_headers())
-    soup = BeautifulSoup(page.content, 'html.parser')
+    soup: BeautifulSoup = BeautifulSoup(page.content, 'html.parser')
 
     pager = soup.find('div', class_='pager')
     current_page: str = pager['data-currentpage']
@@ -49,6 +77,9 @@ def main():
     urls = create_urls(current_page, page_count)
     raw_page_list = async_aiohttp_get_all(urls)
     raw_page_list.insert(0, page.content)
+
+    comments = url_parser(raw_page_list)
+    comment_parser(comments)
 
 
 if __name__ == "__main__":
