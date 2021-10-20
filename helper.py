@@ -1,5 +1,6 @@
 from random import choice
 from typing import Dict, List
+from fake_useragent import UserAgent
 
 
 DESKTOP_AGENT: List[str] = [
@@ -27,3 +28,8 @@ DESKTOP_AGENT: List[str] = [
 
 def random_headers() -> Dict[str, str]:
     return {'User-Agent': choice(DESKTOP_AGENT)}
+
+
+def create_fake_agent():
+    ua = UserAgent(use_cache_server=False)
+    return {'User-Agent': str(ua.chrome)}
